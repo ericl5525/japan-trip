@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japan 2026 Travel Journal & Planner</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet OpenStreetMap CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Firebase App & Realtime Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        // --------------------------------------------------------------------
+        // REPLACE THE KEYS BELOW WITH YOUR EXACT FIREBASE CONFIG FROM STEP 1
+        // --------------------------------------------------------------------
+       const firebaseConfig = {
+  apiKey: "AIzaSyC5a_4bYUaUoM3TSQZQNnwR6aKl-vUVj0E",
+  authDomain: "trip-planner-67e33.firebaseapp.com",
+  databaseURL: "https://trip-planner-67e33-default-rtdb.firebaseio.com",
+  projectId: "trip-planner-67e33",
+  storageBucket: "trip-planner-67e33.firebasestorage.app",
+  messagingSenderId: "195887080529",
+  appId: "1:195887080529:web:b18482caa4348feb7e8470",
+  measurementId: "G-7SXSTJ1L0F"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+    <style>
+        .active-tab {
+            border-bottom: 2px solid #ef4444;
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <div class="flex items-center space-x-3">
+                <i data-lucide="plane" class="w-8 h-8 text-red-500"></i>
+                <span class="text-xl font-bold tracking-tight text-slate-900">Japan Trip 2026</span>
+                <span class="text-xs bg-red-100 text-red-600 font-medium px-2.5 py-0.5 rounded-full">Nov 25 - Dec 12</span>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-2">
+                <span class="text-xs text-slate-500 font-medium mr-1">Travelers:</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <i data-lucide="user" class="w-3 h-3 mr-1"></i> Antonio
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                    <i data-lucide="user" class="w-3 h-3 mr-1"></i> Eric (Driver)
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    <i data-lucide="user" class="w-3 h-3 mr-1"></i> Linh
+                </span>
+            </div>
+        </div>
+
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8 border-t border-slate-100">
+            <button onclick="switchTab('calendar')" id="tab-calendar" class="active-tab py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>Interactive Calendar</span>
+            </button>
+            <button onclick="switchTab('itinerary')" id="tab-itinerary" class="text-slate-500 hover:text-slate-700 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                <span>Trip Legs & Places</span>
+            </button>
+            <button onclick="switchTab('expenses')" id="tab-expenses" class="text-slate-500 hover:text-slate-700 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+                <span>Expenses & Split</span>
+            </button>
+            <button onclick="switchTab('reservations')" id="tab-reservations" class="text-slate-500 hover:text-slate-700 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent">
+                <i data-lucide="ticket" class="w-4 h-4"></i>
+                <span>Reservations</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- CALENDAR TAB -->
+        <section id="view-calendar" class="space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Trip Schedule</h2>
+                    <p class="text-sm text-slate-500">Click on any date cell to view, edit, or customize locations and daily activities.</p>
+                </div>
+                <button onclick="openAddEventModal()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add Custom Date Leg</span>
+                </button>
+            </div>
+
+            <!-- Month 1: Nov 2026 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-800 text-white px-4 py-3 font-semibold flex justify-between items-center">
+                    <span>November 2026</span>
+                    <span class="text-xs font-normal text-slate-300">RDU &rarr; TOK &rarr; KYO &rarr; UJI</span>
+                </div>
+                <div class="calendar-grid bg-slate-200 gap-px text-center text-xs font-semibold text-slate-600 py-2">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="november-grid" class="calendar-grid bg-slate-200 gap-px text-xs"></div>
+            </div>
+
+            <!-- Month 2: Dec 2026 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-800 text-white px-4 py-3 font-semibold flex justify-between items-center">
+                    <span>December 2026</span>
+                    <span class="text-xs font-normal text-slate-300">KYO &rarr; SAP &rarr; TOK &rarr; RDU</span>
+                </div>
+                <div class="calendar-grid bg-slate-200 gap-px text-center text-xs font-semibold text-slate-600 py-2">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="december-grid" class="calendar-grid bg-slate-200 gap-px text-xs"></div>
+            </div>
+        </section>
+
+        <!-- ITINERARY & MAPS TAB -->
+        <section id="view-itinerary" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-slate-900">Trip Destinations</h2>
+                        <button onclick="openLegModal()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded-md hover:bg-slate-800 transition">
+                            + Add Leg
+                        </button>
+                    </div>
+
+                    <div id="legs-container" class="space-y-3 max-h-[650px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="lg:col-span-7 flex flex-col space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col h-[650px]">
+                        <h3 class="font-bold text-slate-900 flex items-center space-x-2 mb-3">
+                            <i data-lucide="map" class="w-4 h-4 text-red-500"></i>
+                            <span>Interactive Japan Map</span>
+                        </h3>
+                        <div id="map" class="w-full flex-1 rounded-lg border border-slate-200 z-10"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPENSES & SPLIT TAB -->
+        <section id="view-expenses" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Expense Tracker & Splitter</h2>
+                    <p class="text-sm text-slate-500">Live balance breakdown for Antonio, Eric, and Linh.</p>
+                </div>
+                <button onclick="openExpenseModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Log Expense</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Spent</span>
+                    <div id="dash-total" class="text-2xl font-black text-slate-900 mt-1">$0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">Antonio Paid</span>
+                    <div id="dash-antonio" class="text-xl font-bold text-slate-800 mt-1">$0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-emerald-500 uppercase tracking-wider">Eric Paid</span>
+                    <div id="dash-eric" class="text-xl font-bold text-slate-800 mt-1">$0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-purple-500 uppercase tracking-wider">Linh Paid</span>
+                    <div id="dash-linh" class="text-xl font-bold text-slate-800 mt-1">$0.00</div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md">
+                <h3 class="text-sm font-semibold uppercase text-slate-400 tracking-wider mb-2">Settlement Summary</h3>
+                <div id="settlement-container" class="space-y-2 text-sm font-medium"></div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800">All Expenses Ledger</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-semibold text-xs border-b border-slate-200">
+                                <th class="p-4">Item / Description</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">Amount ($)</th>
+                                <th class="p-4">Paid By</th>
+                                <th class="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESERVATIONS TAB -->
+        <section id="view-reservations" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Reservations & Bookings</h2>
+                </div>
+                <button onclick="openReservationModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add Reservation</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="reservations-container"></div>
+        </section>
+
+    </main>
+
+    <!-- MODALS -->
+    <div id="modal-date-details" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900" id="date-details-title">Edit Date Details</h3>
+                <button onclick="closeModal('modal-date-details')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="date-form" onsubmit="saveDateDetails(event)" class="space-y-3">
+                <input type="hidden" id="edit-date-key">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Location Header</label>
+                    <input type="text" id="edit-date-title" required class="w-full text-sm border border-slate-300 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Base Lodging</label>
+                    <input type="text" id="edit-date-lodging" class="w-full text-sm border border-slate-300 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Notes & Activities</label>
+                    <textarea id="edit-date-notes" rows="4" class="w-full text-sm border border-slate-300 rounded-lg p-2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-date-details')" class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPENSE -->
+    <div id="modal-expense" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900" id="expense-modal-title">Add Expense Item</h3>
+                <button onclick="closeModal('modal-expense')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-3">
+                <input type="hidden" id="exp-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Item Description</label>
+                    <input type="text" id="exp-name" required class="w-full text-sm border border-slate-300 rounded-lg p-2">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Amount ($ USD)</label>
+                        <input type="number" step="0.01" id="exp-amount" required class="w-full text-sm border border-slate-300 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Who Paid?</label>
+                        <select id="exp-payer" class="w-full text-sm border border-slate-300 rounded-lg p-2 bg-white">
+                            <option value="Antonio">Antonio</option>
+                            <option value="Eric">Eric</option>
+                            <option value="Linh">Linh</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                    <select id="exp-category" class="w-full text-sm border border-slate-300 rounded-lg p-2 bg-white">
+                        <option value="Lodging">Lodging</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Food & Dining">Food & Dining</option>
+                        <option value="Activities">Activities</option>
+                        <option value="Misc">Misc</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-expense')" class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Realtime Sync JavaScript Engine -->
+    <script>
+        let dateMap = {}, expenses = [], tripLegs = [], reservations = [];
+
+        // Attach Realtime Listeners to Firebase Database
+        db.ref('dateMap').on('value', snapshot => {
+            dateMap = snapshot.val() || {};
+            renderNovemberCalendar();
+            renderDecemberCalendar();
+        });
+
+        db.ref('expenses').on('value', snapshot => {
+            const data = snapshot.val();
+            expenses = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+            renderExpenses();
+        });
+
+        db.ref('tripLegs').on('value', snapshot => {
+            const data = snapshot.val();
+            tripLegs = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+            renderLegs();
+        });
+
+        db.ref('reservations').on('value', snapshot => {
+            const data = snapshot.val();
+            reservations = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+            renderReservations();
+        });
+
+        function switchTab(tabId) {
+            ['calendar', 'itinerary', 'expenses', 'reservations'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = "text-slate-500 hover:text-slate-700 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent";
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).className = "active-tab py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium";
+        }
+
+        function renderNovemberCalendar() {
+            const novContainer = document.getElementById('november-grid');
+            novContainer.innerHTML = '';
+            for (let day = 1; day <= 30; day++) {
+                if (day < 25) {
+                    novContainer.innerHTML += `<div class="bg-slate-50 min-h-[80px] p-1 text-slate-300">X</div>`;
+                } else {
+                    const dateKey = `2026-11-${day}`;
+                    const ev = dateMap[dateKey] || { title: 'Day Schedule' };
+                    novContainer.innerHTML += `
+                        <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white hover:bg-red-50 cursor-pointer min-h-[80px] p-1.5 flex flex-col justify-between border hover:border-red-300 rounded">
+                            <span class="font-bold text-slate-700">${day}</span>
+                            <div class="bg-red-50 border border-red-200 text-red-700 rounded p-1 text-left font-medium">${ev.title}</div>
+                        </div>`;
+                }
+            }
+        }
+
+        function renderDecemberCalendar() {
+            const decContainer = document.getElementById('december-grid');
+            decContainer.innerHTML = '';
+            decContainer.innerHTML += `<div class="bg-slate-50 min-h-[80px] p-1 text-slate-300"></div><div class="bg-slate-50 min-h-[80px] p-1 text-slate-300"></div>`;
+            for (let day = 1; day <= 31; day++) {
+                const dayStr = day < 10 ? `0${day}` : `${day}`;
+                const dateKey = `2026-12-${dayStr}`;
+                const ev = dateMap[dateKey] || { title: '+ Edit' };
+                decContainer.innerHTML += `
+                    <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white hover:bg-blue-50 cursor-pointer min-h-[80px] p-1.5 flex flex-col justify-between border hover:border-blue-300 rounded">
+                        <span class="font-bold text-slate-800">${day}</span>
+                        <div class="bg-blue-50 border border-blue-200 text-blue-700 rounded p-1 text-left font-medium mt-1">${ev.title}</div>
+                    </div>`;
+            }
+        }
+
+        function openDateDetailsModal(dateKey) {
+            const data = dateMap[dateKey] || { title: 'Day Schedule', notes: '', lodging: '' };
+            document.getElementById('edit-date-key').value = dateKey;
+            document.getElementById('date-details-title').innerText = `Edit Details for ${dateKey}`;
+            document.getElementById('edit-date-title').value = data.title;
+            document.getElementById('edit-date-lodging').value = data.lodging || '';
+            document.getElementById('edit-date-notes').value = data.notes || '';
+            openModal('modal-date-details');
+        }
+
+        function saveDateDetails(e) {
+            e.preventDefault();
+            const dateKey = document.getElementById('edit-date-key').value;
+            db.ref(`dateMap/${dateKey}`).set({
+                title: document.getElementById('edit-date-title').value,
+                lodging: document.getElementById('edit-date-lodging').value,
+                notes: document.getElementById('edit-date-notes').value
+            });
+            closeModal('modal-date-details');
+        }
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expenses-table-body');
+            tbody.innerHTML = '';
+            let totalSpent = 0, paidMap = { Antonio: 0, Eric: 0, Linh: 0 };
+
+            expenses.forEach(exp => {
+                totalSpent += exp.amount;
+                if(paidMap[exp.paidBy] !== undefined) paidMap[exp.paidBy] += exp.amount;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-4 font-medium">${exp.description}</td>
+                        <td class="p-4"><span class="text-xs bg-slate-100 px-2 py-1 rounded-full">${exp.category}</span></td>
+                        <td class="p-4 font-semibold">$${exp.amount.toFixed(2)}</td>
+                        <td class="p-4"><span class="font-semibold text-xs">${exp.paidBy}</span></td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteExpense('${exp.id}')" class="text-xs text-red-500 hover:underline">Remove</button>
+                        </td>
+                    </tr>`;
+            });
+
+            document.getElementById('dash-total').innerText = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('dash-antonio').innerText = `$${paidMap['Antonio'].toFixed(2)}`;
+            document.getElementById('dash-eric').innerText = `$${paidMap['Eric'].toFixed(2)}`;
+            document.getElementById('dash-linh').innerText = `$${paidMap['Linh'].toFixed(2)}`;
+        }
+
+        function saveExpense(e) {
+            e.preventDefault();
+            db.ref('expenses').push({
+                description: document.getElementById('exp-name').value,
+                amount: parseFloat(document.getElementById('exp-amount').value),
+                paidBy: document.getElementById('exp-payer').value,
+                category: document.getElementById('exp-category').value
+            });
+            closeModal('modal-expense');
+        }
+
+        function deleteExpense(id) { db.ref(`expenses/${id}`).remove(); }
+
+        function renderLegs() {
+            const container = document.getElementById('legs-container');
+            container.innerHTML = '';
+            tripLegs.forEach(leg => {
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border space-y-2">
+                        <h4 class="font-bold">${leg.title}</h4>
+                        <p class="text-xs text-slate-600">${leg.notes}</p>
+                    </div>`;
+            });
+        }
+
+        function renderReservations() {
+            const container = document.getElementById('reservations-container');
+            container.innerHTML = '';
+            reservations.forEach(r => {
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-xl border space-y-2">
+                        <h4 class="font-bold">${r.name}</h4>
+                        <p class="text-xs text-slate-600">${r.location} - ${r.cost}</p>
+                    </div>`;
+            });
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openExpenseModal() { openModal('modal-expense'); }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
