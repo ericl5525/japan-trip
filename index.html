@@ -12,22 +12,27 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Firebase App & Realtime Database SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+   <!-- Firebase Compatibility Libraries -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <script>
-        // --------------------------------------------------------------------
-        // REPLACE THE KEYS BELOW WITH YOUR EXACT FIREBASE CONFIG FROM STEP 1
-        // --------------------------------------------------------------------
-       const firebaseConfig = {
-  apiKey: "AIzaSyC5a_4bYUaUoM3TSQZQNnwR6aKl-vUVj0E",
-  authDomain: "trip-planner-67e33.firebaseapp.com",
-  databaseURL: "https://trip-planner-67e33-default-rtdb.firebaseio.com",
-  projectId: "trip-planner-67e33",
-  storageBucket: "trip-planner-67e33.firebasestorage.app",
-  messagingSenderId: "195887080529",
-  appId: "1:195887080529:web:b18482caa4348feb7e8470",
+<script>
+    // Live Firebase Config Keys
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5a_4bYaUom3TSQZQNnwR6aKl-vUVj0E",
+      authDomain: "trip-planner-67e33.firebaseapp.com",
+      databaseURL: "https://trip-planner-67e33-default-rtdb.firebaseio.com",
+      projectId: "trip-planner-67e33",
+      storageBucket: "trip-planner-67e33.firebasestorage.app",
+      messagingSenderId: "195887080529",
+      appId: "1:195887080529:web:b18482caa4348feb7e8470",
+      measurementId: "G-7SXSTJ1L0F"
+    };
+
+    // Initialize Firebase Realtime Database
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+</script>
   measurementId: "G-7SXSTJ1L0F"
 };
 
