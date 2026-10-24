@@ -2,9 +2,9 @@
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Travel Journal & Planner</title>
-    <!-- Tailwind CSS with Dark Mode Class Strategy -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -40,114 +40,117 @@
     </script>
     <style>
         .active-tab {
-            border-bottom: 2px solid #ef4444;
+            border-bottom: 2.5px solid #ef4444;
             color: #ef4444;
-            font-weight: 600;
+            font-weight: 700;
         }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
         }
+        /* Mobile scrollbar styling for Safari */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200 overflow-x-hidden">
 
-    <!-- Header Navigation -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 transition-colors duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+    <!-- Header Navigation (Mobile Optimized) -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 transition-colors duration-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 pb-2 flex flex-col space-y-2.5">
             
-            <!-- Dynamic Trip Title & Edit Action -->
-            <div class="flex items-center space-x-3">
-                <i data-lucide="plane" class="w-8 h-8 text-red-500 flex-shrink-0"></i>
-                <div class="flex items-center space-x-2">
-                    <h1 id="app-trip-title" class="text-xl font-bold tracking-tight text-slate-900 dark:text-white cursor-pointer hover:text-red-500 transition" onclick="openTripTitleModal()" title="Click to edit trip title">
+            <!-- Top Row: Icon + Title + Theme Toggle -->
+            <div class="flex justify-between items-center w-full">
+                <div class="flex items-center space-x-2 min-w-0 flex-1">
+                    <i data-lucide="plane" class="w-6 h-6 sm:w-7 sm:h-7 text-red-500 flex-shrink-0"></i>
+                    <h1 id="app-trip-title" class="text-base sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white truncate cursor-pointer hover:text-red-500 transition" onclick="openTripTitleModal()" title="Click to edit trip title">
                         Japan Trip 2026
                     </h1>
-                    <button onclick="openTripTitleModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" title="Edit Trip Title">
-                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    <button onclick="openTripTitleModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition flex-shrink-0">
+                        <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                     </button>
-                </div>
-                <span id="app-trip-dates" class="text-xs bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400 font-medium px-2.5 py-0.5 rounded-full hidden md:inline-block">
-                    Nov 25 - Dec 12
-                </span>
-            </div>
-            
-            <!-- Right Utility Bar: Travelers & Dark Mode Toggle -->
-            <div class="flex items-center space-x-3">
-                <!-- Group Members Badges -->
-                <div class="flex items-center space-x-2">
-                    <span class="hidden sm:inline text-xs text-slate-500 dark:text-slate-400 font-medium mr-1">Travelers:</span>
-                    <div id="traveler-badges-container" class="flex space-x-1.5"></div>
-                    <button onclick="openTravelersModal()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-md font-medium transition flex items-center space-x-1">
-                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Manage Group</span>
-                    </button>
+                    <span id="app-trip-dates" class="text-[10px] sm:text-xs bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400 font-medium px-2 py-0.5 rounded-full hidden sm:inline-block">
+                        Nov 25 - Dec 12
+                    </span>
                 </div>
 
-                <!-- Dark / Light Mode Toggle Button -->
-                <button onclick="toggleDarkMode()" class="p-2 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title="Toggle Light/Dark Theme">
-                    <i id="theme-icon-sun" data-lucide="sun" class="w-5 h-5 hidden"></i>
-                    <i id="theme-icon-moon" data-lucide="moon" class="w-5 h-5"></i>
+                <button onclick="toggleDarkMode()" class="p-1.5 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition ml-2 flex-shrink-0" title="Toggle Light/Dark Theme">
+                    <i id="theme-icon-sun" data-lucide="sun" class="w-4 h-4 sm:w-5 sm:h-5 hidden"></i>
+                    <i id="theme-icon-moon" data-lucide="moon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Second Row: Traveler Badges Horizontal Scroll -->
+            <div class="flex items-center justify-between space-x-2 overflow-x-auto no-scrollbar py-0.5">
+                <div id="traveler-badges-container" class="flex items-center space-x-1.5 flex-nowrap"></div>
+                <button onclick="openTravelersModal()" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-md font-medium transition flex items-center space-x-1 flex-shrink-0">
+                    <i data-lucide="user-plus" class="w-3 h-3"></i>
+                    <span>Manage</span>
                 </button>
             </div>
         </div>
 
-        <!-- Scrollable Navigation Tabs -->
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 sm:space-x-8 border-t border-slate-100 dark:border-slate-700 overflow-x-auto">
-            <button onclick="switchTab('calendar')" id="tab-calendar" class="active-tab py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium whitespace-nowrap">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
-                <span>Interactive Calendar</span>
+        <!-- Scrollable Navigation Tabs (Touch friendly) -->
+        <nav class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex space-x-4 sm:space-x-8 border-t border-slate-100 dark:border-slate-700 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('calendar')" id="tab-calendar" class="active-tab py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium whitespace-nowrap flex-shrink-0">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                <span>Calendar</span>
             </button>
-            <button onclick="switchTab('itinerary')" id="tab-itinerary" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent whitespace-nowrap">
-                <i data-lucide="map-pin" class="w-4 h-4"></i>
-                <span>Trip Legs & Places</span>
+            <button onclick="switchTab('itinerary')" id="tab-itinerary" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                <span>Legs & Places</span>
             </button>
-            <button onclick="switchTab('accommodations')" id="tab-accommodations" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent whitespace-nowrap">
-                <i data-lucide="home" class="w-4 h-4"></i>
+            <button onclick="switchTab('accommodations')" id="tab-accommodations" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0">
+                <i data-lucide="home" class="w-3.5 h-3.5"></i>
                 <span>Accommodations</span>
             </button>
-            <button onclick="switchTab('expenses')" id="tab-expenses" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent whitespace-nowrap">
-                <i data-lucide="wallet" class="w-4 h-4"></i>
+            <button onclick="switchTab('expenses')" id="tab-expenses" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0">
+                <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
                 <span>Expenses & Split</span>
             </button>
-            <button onclick="switchTab('reservations')" id="tab-reservations" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent whitespace-nowrap">
-                <i data-lucide="ticket" class="w-4 h-4"></i>
+            <button onclick="switchTab('reservations')" id="tab-reservations" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0">
+                <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
                 <span>Reservations</span>
             </button>
         </nav>
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full">
 
         <!-- CALENDAR TAB -->
-        <section id="view-calendar" class="space-y-6">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <section id="view-calendar" class="space-y-4 sm:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Trip Schedule</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">View and manage your daily itinerary, activities, and lodging plans.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Trip Schedule</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">View and manage your daily itinerary, activities, and lodging plans.</p>
                 </div>
 
                 <!-- Dynamic Month Selector & Controls -->
-                <div class="flex items-center space-x-2 bg-white dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex-wrap gap-y-2">
-                    <button onclick="navigateMonth(-1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition" title="Previous Month">
-                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                <div class="flex items-center space-x-1.5 bg-white dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex-wrap gap-y-1.5">
+                    <button onclick="navigateMonth(-1)" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition" title="Previous Month">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </button>
                     
-                    <select id="month-select" onchange="jumpToMonth(this.value)" class="text-sm font-bold text-slate-800 dark:text-slate-100 bg-transparent py-1 px-2 focus:outline-none cursor-pointer">
+                    <select id="month-select" onchange="jumpToMonth(this.value)" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 bg-transparent py-1 px-1 focus:outline-none cursor-pointer">
                     </select>
 
-                    <button onclick="navigateMonth(1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition" title="Next Month">
-                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    <button onclick="navigateMonth(1)" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition" title="Next Month">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                     
-                    <button onclick="jumpToToday()" class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center space-x-1">
-                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                    <button onclick="jumpToToday()" class="text-[11px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold px-2 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center space-x-1">
+                        <i data-lucide="clock" class="w-3 h-3"></i>
                         <span>Today</span>
                     </button>
 
-                    <button onclick="jumpToCurrentTripMonth()" id="btn-trip-jump" class="text-xs bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold px-3.5 py-1.5 rounded-lg hover:from-red-600 hover:to-rose-700 transition flex items-center space-x-1.5 shadow-md animate-pulse">
-                        <i data-lucide="plane" class="w-3.5 h-3.5"></i>
+                    <button onclick="jumpToCurrentTripMonth()" id="btn-trip-jump" class="text-[11px] bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold px-2.5 py-1 rounded-lg hover:from-red-600 hover:to-rose-700 transition flex items-center space-x-1 shadow-sm">
+                        <i data-lucide="plane" class="w-3 h-3"></i>
                         <span id="trip-jump-text">Japan Trip 2026</span>
                     </button>
                 </div>
@@ -155,24 +158,30 @@
 
             <!-- Dynamic Active Month Display Container -->
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div class="bg-slate-800 dark:bg-slate-950 text-white px-4 py-3 font-semibold flex justify-between items-center">
+                <div class="bg-slate-800 dark:bg-slate-950 text-white px-3 py-2.5 font-semibold flex justify-between items-center text-xs sm:text-sm">
                     <span id="calendar-header-title">November 2026</span>
-                    <span id="calendar-header-subtitle" class="text-xs font-normal text-slate-300">RDU &rarr; TOK &rarr; KYO &rarr; UJI</span>
+                    <span id="calendar-header-subtitle" class="text-[10px] sm:text-xs font-normal text-slate-300 truncate max-w-[180px] sm:max-w-none">RDU &rarr; TOK &rarr; KYO</span>
                 </div>
-                <div class="calendar-grid bg-slate-200 dark:bg-slate-700 gap-px text-center text-xs font-semibold text-slate-600 dark:text-slate-300 py-2">
-                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                
+                <!-- Horizontal scroll wrapper for phone screens -->
+                <div class="overflow-x-auto">
+                    <div class="min-w-[340px]">
+                        <div class="calendar-grid bg-slate-200 dark:bg-slate-700 gap-px text-center text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 py-1.5">
+                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
+                        <div id="dynamic-calendar-grid" class="calendar-grid bg-slate-200 dark:bg-slate-700 gap-px text-[10px] sm:text-xs"></div>
+                    </div>
                 </div>
-                <div id="dynamic-calendar-grid" class="calendar-grid bg-slate-200 dark:bg-slate-700 gap-px text-xs"></div>
             </div>
 
             <!-- Logistics Notes Box -->
-            <div class="bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-400 p-4 rounded-r-lg text-amber-800 dark:text-amber-300 text-sm flex space-x-3">
-                <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 text-amber-500 mt-0.5"></i>
+            <div class="bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-400 p-3 sm:p-4 rounded-r-lg text-amber-800 dark:text-amber-300 text-xs sm:text-sm flex space-x-2.5">
+                <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0 text-amber-500 mt-0.5"></i>
                 <div>
                     <h4 class="font-semibold">Logistics Notes & Luggage Plan:</h4>
-                    <ul class="list-disc list-inside mt-1 space-y-1 text-amber-700 dark:text-amber-400">
-                        <li>Option A: Fly straight out of Osaka (ITM) on Dec 2 to Sapporo. Forward checked luggage directly to Tokyo hotel/Airbnb.</li>
-                        <li>Option B: Book a domestic flight allowing checked luggage both ways.</li>
+                    <ul class="list-disc list-inside mt-1 space-y-1 text-amber-700 dark:text-amber-400 text-[11px] sm:text-xs">
+                        <li>Option A: Fly straight out of Osaka (ITM) on Dec 2 to Sapporo. Forward checked luggage directly to Tokyo hotel/Airbnb[cite: 1].</li>
+                        <li>Option B: Book a domestic flight allowing checked luggage both ways[cite: 1].</li>
                         <li>Fitting side trips: Schedule Kamakura / Nikko car rentals during the final Tokyo leg (Dec 8–11)[cite: 1].</li>
                     </ul>
                 </div>
@@ -180,92 +189,90 @@
         </section>
 
         <!-- ITINERARY & MAPS TAB -->
-        <section id="view-itinerary" class="hidden space-y-6">
+        <section id="view-itinerary" class="hidden space-y-4 sm:space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-5 space-y-4">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-bold text-slate-900 dark:text-white">Trip Destinations</h2>
-                        <button onclick="openLegModal()" class="text-xs bg-red-500 hover:bg-red-600 text-white px-3.5 py-2 rounded-lg font-semibold shadow-sm transition flex items-center space-x-1">
+                        <button onclick="openLegModal()" class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-semibold shadow-sm transition flex items-center space-x-1">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             <span>Add Leg</span>
                         </button>
                     </div>
-                    <div id="legs-container" class="space-y-3 max-h-[650px] overflow-y-auto pr-1"></div>
+                    <div id="legs-container" class="space-y-3 max-h-[500px] sm:max-h-[650px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <div class="lg:col-span-7 flex flex-col space-y-4">
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col h-[650px]">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                    <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col h-[400px] sm:h-[650px]">
+                        <div class="flex justify-between items-center mb-2 sm:mb-3">
+                            <h3 class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5 text-xs sm:text-base">
                                 <i data-lucide="map" class="w-4 h-4 text-red-500"></i>
                                 <span>Interactive Map</span>
                             </h3>
-                            <a id="btn-google-maps" href="https://www.google.com/maps/search/Japan" target="_blank" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium px-3 py-1.5 rounded-lg flex items-center space-x-1 transition">
-                                <span>Open in Google Maps</span>
+                            <a id="btn-google-maps" href="https://www.google.com/maps/search/Japan" target="_blank" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium px-2.5 py-1 rounded-lg flex items-center space-x-1 transition">
+                                <span>Google Maps</span>
                                 <i data-lucide="external-link" class="w-3 h-3"></i>
                             </a>
                         </div>
-                        <div id="map" class="w-full flex-1 rounded-lg border border-slate-200 dark:border-slate-700 z-10 min-h-[400px]"></div>
+                        <div id="map" class="w-full flex-1 rounded-lg border border-slate-200 dark:border-slate-700 z-10 min-h-[300px]"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ACCOMMODATIONS TAB -->
-        <section id="view-accommodations" class="hidden space-y-6">
+        <section id="view-accommodations" class="hidden space-y-4 sm:space-y-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Lodging & Accommodations</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Track Airbnbs, hotels, and ryokans with direct booking links.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Lodging & Accommodations</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Track Airbnbs, hotels, and ryokans with direct booking links.</p>
                 </div>
-                <button onclick="openAccommodationModal()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>Add Accommodation</span>
+                <button onclick="openAccommodationModal()" class="bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg flex items-center space-x-1.5 shadow-sm transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Add</span>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="accommodations-container">
-                <!-- Dynamically populated accommodation cards -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="accommodations-container"></div>
         </section>
 
         <!-- EXPENSES & SPLIT TAB -->
-        <section id="view-expenses" class="hidden space-y-6">
+        <section id="view-expenses" class="hidden space-y-4 sm:space-y-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Expense Tracker & Splitter</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400" id="expense-subtitle">Live balance breakdown for your group.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Expense Tracker & Splitter</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400" id="expense-subtitle">Live balance breakdown for your group.</p>
                 </div>
-                <button onclick="openExpenseModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <button onclick="openExpenseModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg flex items-center space-x-1.5 shadow-sm transition">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
                     <span>Log Expense</span>
                 </button>
             </div>
 
-            <div id="expenses-summary-cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
+            <div id="expenses-summary-cards" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
 
             <!-- Natural Language Splitwise-Style Settlement Card -->
-            <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md border border-slate-800">
+            <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-800">
                 <div class="flex items-center space-x-2 mb-2">
-                    <i data-lucide="arrow-right-left" class="w-5 h-5 text-emerald-400"></i>
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Simplified Group Settlement</h3>
+                    <i data-lucide="arrow-right-left" class="w-4 h-4 text-emerald-400"></i>
+                    <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300">Simplified Group Settlement</h3>
                 </div>
-                <div id="settlement-container" class="space-y-2 text-sm font-medium pt-1"></div>
+                <div id="settlement-container" class="space-y-2 text-xs sm:text-sm font-medium pt-1"></div>
             </div>
 
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-                    <h3 class="font-bold text-slate-800 dark:text-white">All Expenses Ledger</h3>
+                <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-slate-800 dark:text-white text-xs sm:text-base">All Expenses Ledger</h3>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
                         <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-300 font-semibold text-xs border-b border-slate-200 dark:border-slate-700">
-                                <th class="p-4">Item / Description</th>
-                                <th class="p-4">Category</th>
-                                <th class="p-4">Amount ($)</th>
-                                <th class="p-4">Paid By</th>
-                                <th class="p-4 text-right">Actions</th>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-300 font-semibold text-[10px] sm:text-xs border-b border-slate-200 dark:border-slate-700">
+                                <th class="p-3">Item / Description</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Amount ($)</th>
+                                <th class="p-3">Paid By</th>
+                                <th class="p-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="expenses-table-body" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -275,145 +282,145 @@
         </section>
 
         <!-- RESERVATIONS TAB -->
-        <section id="view-reservations" class="hidden space-y-6">
+        <section id="view-reservations" class="hidden space-y-4 sm:space-y-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Reservations & Bookings</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Car rentals, flights, attractions, and ticket bookings.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Reservations & Bookings</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Car rentals, flights, attractions, and ticket bookings.</p>
                 </div>
-                <button onclick="openReservationModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>Add Reservation</span>
+                <button onclick="openReservationModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg flex items-center space-x-1.5 shadow-sm transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Add</span>
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="reservations-container"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="reservations-container"></div>
         </section>
 
     </main>
 
     <!-- MODAL: ACCOMMODATION -->
-    <div id="modal-accommodation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold" id="acc-modal-title">Add Accommodation</h3>
+    <div id="modal-accommodation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="acc-modal-title">Add Accommodation</h3>
                 <button onclick="closeModal('modal-accommodation')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="accommodation-form" onsubmit="saveAccommodation(event)" class="space-y-3">
+            <form id="accommodation-form" onsubmit="saveAccommodation(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <input type="hidden" id="acc-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Place / Property Name</label>
-                    <input type="text" id="acc-name" required placeholder="e.g. Home in Shinagawa City" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Place / Property Name</label>
+                    <input type="text" id="acc-name" required placeholder="e.g. Home in Shinagawa City" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Area / City</label>
-                        <input type="text" id="acc-area" required placeholder="e.g. Shinagawa, Tokyo" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Area / City</label>
+                        <input type="text" id="acc-area" required placeholder="e.g. Shinagawa" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost / Price</label>
-                        <input type="text" id="acc-price" placeholder="e.g. $226.81" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost / Price</label>
+                        <input type="text" id="acc-price" placeholder="e.g. $226.81" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking / Airbnb Link</label>
-                    <input type="url" id="acc-link" placeholder="https://www.airbnb.com/trips/..." class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking / Airbnb Link</label>
+                    <input type="url" id="acc-link" placeholder="https://www.airbnb.com/trips/..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes / Instructions</label>
-                    <textarea id="acc-notes" rows="3" placeholder="Check-in times, door codes, key retrieval..." class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes / Instructions</label>
+                    <textarea id="acc-notes" rows="2" placeholder="Door codes, check-in instructions..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-accommodation')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Accommodation</button>
+                    <button type="button" onclick="closeModal('modal-accommodation')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Accommodation</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: TRIP TITLE & DATES -->
-    <div id="modal-trip-title" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold">Edit Trip Details</h3>
+    <div id="modal-trip-title" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold">Edit Trip Details</h3>
                 <button onclick="closeModal('modal-trip-title')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form onsubmit="saveTripDetails(event)" class="space-y-3">
+            <form onsubmit="saveTripDetails(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Name</label>
-                    <input type="text" id="edit-trip-name-input" required placeholder="e.g. Japan Trip 2026" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Name</label>
+                    <input type="text" id="edit-trip-name-input" required placeholder="e.g. Japan Trip 2026" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Dates Badge</label>
-                    <input type="text" id="edit-trip-dates-input" placeholder="e.g. Nov 25 - Dec 12" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Dates Badge</label>
+                    <input type="text" id="edit-trip-dates-input" placeholder="e.g. Nov 25 - Dec 12" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-trip-title')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Trip Name</button>
+                    <button type="button" onclick="closeModal('modal-trip-title')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: ADD / EDIT TRIP LEG -->
-    <div id="modal-leg" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold" id="leg-modal-title">Add / Edit Trip Leg</h3>
+    <div id="modal-leg" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="leg-modal-title">Add / Edit Trip Leg</h3>
                 <button onclick="closeModal('modal-leg')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="leg-form" onsubmit="saveLeg(event)" class="space-y-3">
+            <form id="leg-form" onsubmit="saveLeg(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <input type="hidden" id="leg-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Destination Name</label>
-                    <input type="text" id="leg-title" required class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Destination Name</label>
+                    <input type="text" id="leg-title" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Start Date</label>
-                        <input type="date" id="leg-start" required class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Start Date</label>
+                        <input type="date" id="leg-start" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">End Date</label>
-                        <input type="date" id="leg-end" required class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">End Date</label>
+                        <input type="date" id="leg-end" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Lodging Details / Name</label>
-                    <input type="text" id="leg-lodging" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Lodging Details / Name</label>
+                    <input type="text" id="leg-lodging" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
-                    <input type="url" id="leg-lodging-url" placeholder="https://www.airbnb.com/..." class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
+                    <input type="url" id="leg-lodging-url" placeholder="https://www.airbnb.com/..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Key Activities</label>
-                    <textarea id="leg-notes" rows="3" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Key Activities</label>
+                    <textarea id="leg-notes" rows="2" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-leg')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Leg</button>
+                    <button type="button" onclick="closeModal('modal-leg')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Leg</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: ADD / EDIT RESERVATION -->
-    <div id="modal-reservation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold" id="res-modal-title">Add / Edit Reservation</h3>
+    <div id="modal-reservation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="res-modal-title">Add / Edit Reservation</h3>
                 <button onclick="closeModal('modal-reservation')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="reservation-form" onsubmit="saveReservation(event)" class="space-y-3">
+            <form id="reservation-form" onsubmit="saveReservation(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <input type="hidden" id="res-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Name</label>
-                    <input type="text" id="res-name" required placeholder="e.g. Kyoto Townhouse Airbnb" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Name</label>
+                    <input type="text" id="res-name" required placeholder="e.g. Kyoto Townhouse Airbnb" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Type</label>
-                        <select id="res-type" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Type</label>
+                        <select id="res-type" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                             <option value="Lodging">Lodging</option>
                             <option value="Car Rental">Car Rental</option>
                             <option value="Flight">Flight</option>
@@ -422,8 +429,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Status</label>
-                        <select id="res-status" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Status</label>
+                        <select id="res-status" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                             <option value="Confirmed">Confirmed</option>
                             <option value="Action Required">Action Required</option>
                             <option value="Pending">Pending</option>
@@ -432,53 +439,53 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Location</label>
-                        <input type="text" id="res-location" placeholder="e.g. Kyoto" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Location</label>
+                        <input type="text" id="res-location" placeholder="e.g. Kyoto" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost</label>
-                        <input type="text" id="res-cost" placeholder="e.g. $366.42" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost</label>
+                        <input type="text" id="res-cost" placeholder="e.g. $366.42" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
-                    <input type="url" id="res-link" placeholder="https://..." class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
+                    <input type="url" id="res-link" placeholder="https://..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-reservation')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Save Booking</button>
+                    <button type="button" onclick="closeModal('modal-reservation')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Save Booking</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: EXPENSE -->
-    <div id="modal-expense" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold" id="expense-modal-title">Add Expense Item</h3>
+    <div id="modal-expense" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="expense-modal-title">Add Expense Item</h3>
                 <button onclick="closeModal('modal-expense')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-3">
+            <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <input type="hidden" id="exp-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Item Description</label>
-                    <input type="text" id="exp-name" required placeholder="e.g. Shinagawa Airbnb" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Item Description</label>
+                    <input type="text" id="exp-name" required placeholder="e.g. Shinagawa Airbnb" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Amount ($ USD)</label>
-                        <input type="number" step="0.01" id="exp-amount" required placeholder="0.00" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Amount ($ USD)</label>
+                        <input type="number" step="0.01" id="exp-amount" required placeholder="0.00" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Who Paid?</label>
-                        <select id="exp-payer" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></select>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Who Paid?</label>
+                        <select id="exp-payer" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Category Select</label>
-                    <select id="exp-category-select" onchange="toggleCustomCategory(this.value)" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Category Select</label>
+                    <select id="exp-category-select" onchange="toggleCustomCategory(this.value)" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                         <option value="Lodging">Lodging</option>
                         <option value="Transportation">Transportation</option>
                         <option value="Food & Dining">Food & Dining</option>
@@ -488,63 +495,63 @@
                     </select>
                 </div>
                 <div id="custom-category-container" class="hidden">
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Custom Category Name</label>
-                    <input type="text" id="exp-category-custom" placeholder="e.g. Souvenirs, Shinkansen, etc." class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Custom Category Name</label>
+                    <input type="text" id="exp-category-custom" placeholder="e.g. Souvenirs, Shinkansen, etc." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-expense')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Save Expense</button>
+                    <button type="button" onclick="closeModal('modal-expense')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Save Expense</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: DYNAMIC TRAVELERS -->
-    <div id="modal-travelers" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold">Manage Group Travelers</h3>
+    <div id="modal-travelers" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold">Manage Group Travelers</h3>
                 <button onclick="closeModal('modal-travelers')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form onsubmit="saveTraveler(event)" class="flex space-x-2">
-                <input type="text" id="new-traveler-name" placeholder="Enter traveler name..." required class="flex-1 text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
-                <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 rounded-lg">+ Add</button>
+            <form onsubmit="saveTraveler(event)" class="flex space-x-2 text-xs sm:text-sm">
+                <input type="text" id="new-traveler-name" placeholder="Enter traveler name..." required class="flex-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                <button type="submit" class="px-3 py-1.5 font-semibold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 rounded-lg">+ Add</button>
             </form>
-            <div class="space-y-2 pt-2">
-                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Current Travelers:</label>
+            <div class="space-y-2 pt-1 text-xs">
+                <label class="block font-semibold text-slate-600 dark:text-slate-300">Current Travelers:</label>
                 <div id="travelers-list-modal" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
             </div>
             <div class="flex justify-end pt-2">
-                <button type="button" onclick="closeModal('modal-travelers')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Done</button>
+                <button type="button" onclick="closeModal('modal-travelers')" class="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Done</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL: DATE DETAILS -->
-    <div id="modal-date-details" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-lg font-bold" id="date-details-title">Edit Date Details</h3>
+    <div id="modal-date-details" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="date-details-title">Edit Date Details</h3>
                 <button onclick="closeModal('modal-date-details')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="date-form" onsubmit="saveDateDetails(event)" class="space-y-3">
+            <form id="date-form" onsubmit="saveDateDetails(event)" class="space-y-2.5 text-xs sm:text-sm">
                 <input type="hidden" id="edit-date-key">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Location Header</label>
-                    <input type="text" id="edit-date-title" required class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Location Header</label>
+                    <input type="text" id="edit-date-title" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Base Lodging</label>
-                    <input type="text" id="edit-date-lodging" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Base Lodging</label>
+                    <input type="text" id="edit-date-lodging" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Activities</label>
-                    <textarea id="edit-date-notes" rows="4" class="w-full text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Activities</label>
+                    <textarea id="edit-date-notes" rows="3" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-date-details')" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Changes</button>
+                    <button type="button" onclick="closeModal('modal-date-details')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -563,7 +570,6 @@
 
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-        // Dark Mode Toggle Logic
         function toggleDarkMode() {
             const htmlEl = document.documentElement;
             const isDark = htmlEl.classList.toggle('dark');
@@ -602,7 +608,6 @@
             }
         }
 
-        // Firebase Realtime Listeners
         db.ref('tripDetails').on('value', snapshot => {
             const data = snapshot.val();
             if (data) tripDetails = data;
@@ -645,7 +650,6 @@
             if (data) {
                 accommodations = Object.keys(data).map(k => ({ id: k, ...data[k] }));
             } else {
-                // Pre-populate initial Airbnbs from user's travel plans PDF/CSV[cite: 1]
                 accommodations = [
                     { id: 'acc1', name: 'Home in Shinagawa City', area: 'Shinagawa, Tokyo', price: '$226.81', link: 'https://www.airbnb.com/trips/v1/1775096246510033682/ro/RESERVATION2_CHECKIN/HMAHMCXSRM', notes: 'Initial arrival lodging.' },
                     { id: 'acc2', name: 'Townhouse in Kyoto', area: 'Kyoto', price: '$366.42', link: 'https://www.airbnb.com/trips/v1/1775849602737580586/ro/RESERVATION2_CHECKIN/HM8MFMYR9W', notes: 'Historic townhouse base.' }
@@ -682,10 +686,10 @@
         function switchTab(tabId) {
             ['calendar', 'itinerary', 'accommodations', 'expenses', 'reservations'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).className = "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium border-transparent whitespace-nowrap";
+                document.getElementById(`tab-${t}`).className = "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0";
             });
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).className = "active-tab py-3 px-1 text-sm flex items-center space-x-2 border-b-2 font-medium whitespace-nowrap";
+            document.getElementById(`tab-${tabId}`).className = "active-tab py-2.5 px-2 text-xs sm:text-sm flex items-center space-x-1.5 font-medium whitespace-nowrap flex-shrink-0";
 
             if (tabId === 'itinerary') {
                 setTimeout(() => { renderMap(); }, 200);
@@ -709,7 +713,7 @@
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="bg-slate-50 dark:bg-slate-800/50 min-h-[85px] p-1 text-slate-300 dark:text-slate-600"></div>`;
+                grid.innerHTML += `<div class="bg-slate-50 dark:bg-slate-800/50 min-h-[65px] sm:min-h-[85px] p-1 text-slate-300 dark:text-slate-600"></div>`;
             }
 
             for (let day = 1; day <= totalDays; day++) {
@@ -721,23 +725,23 @@
 
                 if (ev) {
                     grid.innerHTML += `
-                        <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-700 cursor-pointer min-h-[85px] p-1.5 flex flex-col justify-between border border-slate-100 dark:border-slate-700 hover:border-blue-400 rounded transition ${isToday ? 'ring-2 ring-red-500 font-bold' : ''}">
+                        <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-700 cursor-pointer min-h-[65px] sm:min-h-[85px] p-1 sm:p-1.5 flex flex-col justify-between border border-slate-100 dark:border-slate-700 hover:border-blue-400 rounded transition ${isToday ? 'ring-2 ring-red-500 font-bold' : ''}">
                             <div class="flex justify-between items-center">
-                                <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">${day}</span>
-                                ${isToday ? `<span class="text-[9px] bg-red-500 text-white px-1 rounded">Today</span>` : ''}
+                                <span class="font-bold text-slate-800 dark:text-slate-200 text-[11px] sm:text-xs">${day}</span>
+                                ${isToday ? `<span class="text-[8px] sm:text-[9px] bg-red-500 text-white px-1 rounded">Today</span>` : ''}
                             </div>
-                            <div class="bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 rounded p-1 text-left font-semibold text-[11px] mt-1 leading-tight">
+                            <div class="bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 rounded p-1 text-left font-semibold text-[9px] sm:text-[11px] mt-0.5 leading-tight truncate">
                                 ${ev.title}
                             </div>
                         </div>`;
                 } else {
                     grid.innerHTML += `
-                        <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer min-h-[85px] p-1.5 flex flex-col justify-between border border-slate-100 dark:border-slate-700 transition ${isToday ? 'ring-2 ring-red-500' : ''}">
+                        <div onclick="openDateDetailsModal('${dateKey}')" class="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer min-h-[65px] sm:min-h-[85px] p-1 sm:p-1.5 flex flex-col justify-between border border-slate-100 dark:border-slate-700 transition ${isToday ? 'ring-2 ring-red-500' : ''}">
                             <div class="flex justify-between items-center">
-                                <span class="font-bold text-slate-400 dark:text-slate-500 text-xs">${day}</span>
-                                ${isToday ? `<span class="text-[9px] bg-red-500 text-white px-1 rounded">Today</span>` : ''}
+                                <span class="font-bold text-slate-400 dark:text-slate-500 text-[11px] sm:text-xs">${day}</span>
+                                ${isToday ? `<span class="text-[8px] sm:text-[9px] bg-red-500 text-white px-1 rounded">Today</span>` : ''}
                             </div>
-                            <span class="text-[10px] text-slate-300 dark:text-slate-600 hover:text-slate-500 text-right">+ Add</span>
+                            <span class="text-[9px] sm:text-[10px] text-slate-300 dark:text-slate-600 text-right">+ Add</span>
                         </div>`;
                 }
             }
@@ -774,33 +778,32 @@
             renderCalendar();
         }
 
-        // Accommodations Manager
         function renderAccommodations() {
             const container = document.getElementById('accommodations-container');
             if(!container) return;
             container.innerHTML = '';
 
             if (accommodations.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic p-4 border border-dashed rounded-lg col-span-3">No accommodations added yet. Click "+ Add Accommodation" above.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg col-span-3">No accommodations added yet. Click "+ Add" above.</p>`;
                 return;
             }
 
             accommodations.forEach(acc => {
                 container.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3 hover:border-red-300 transition flex flex-col justify-between">
-                        <div class="space-y-2">
+                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2.5 hover:border-red-300 transition flex flex-col justify-between">
+                        <div class="space-y-1.5">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-red-500">LODGING</span>
-                                    <h4 class="font-bold text-slate-900 dark:text-white text-lg">${acc.name}</h4>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">LODGING</span>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg leading-snug">${acc.name}</h4>
                                 </div>
-                                ${acc.price ? `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">${acc.price}</span>` : ''}
+                                ${acc.price ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">${acc.price}</span>` : ''}
                             </div>
                             <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Area:</strong> ${acc.area}</p>
                             ${acc.notes ? `<p class="text-xs text-slate-500 dark:text-slate-400">${acc.notes}</p>` : ''}
                         </div>
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                            ${acc.link ? `<a href="${acc.link}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold">View Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : `<span class="text-xs text-slate-400 italic">No link</span>`}
+                        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                            ${acc.link ? `<a href="${acc.link}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold">View Booking <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : `<span class="text-xs text-slate-400 italic">No link</span>`}
                             <div class="space-x-2">
                                 <button onclick="openAccommodationModal('${acc.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
                                 <button onclick="deleteAccommodation('${acc.id}')" class="text-xs text-red-500 hover:underline">Delete</button>
@@ -850,11 +853,8 @@
             closeModal('modal-accommodation');
         }
 
-        function deleteAccommodation(id) {
-            db.ref(`accommodations/${id}`).remove();
-        }
+        function deleteAccommodation(id) { db.ref(`accommodations/${id}`).remove(); }
 
-        // Splitwise-Style Pairwise Settlement Algorithm
         function renderExpenses() {
             const tbody = document.getElementById('expenses-table-body');
             const summaryContainer = document.getElementById('expenses-summary-cards');
@@ -873,31 +873,30 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                        <td class="p-4 font-medium text-slate-800 dark:text-slate-200">${exp.description}</td>
-                        <td class="p-4"><span class="text-xs bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-full font-medium text-slate-700 dark:text-slate-300">${exp.category}</span></td>
-                        <td class="p-4 font-semibold text-slate-800 dark:text-slate-200">$${exp.amount.toFixed(2)}</td>
-                        <td class="p-4"><span class="font-semibold text-xs text-slate-700 dark:text-slate-300">${exp.paidBy}</span></td>
-                        <td class="p-4 text-right">
+                        <td class="p-3 font-medium text-slate-800 dark:text-slate-200">${exp.description}</td>
+                        <td class="p-3"><span class="text-[10px] sm:text-xs bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-medium text-slate-700 dark:text-slate-300">${exp.category}</span></td>
+                        <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">$${exp.amount.toFixed(2)}</td>
+                        <td class="p-3"><span class="font-semibold text-xs text-slate-700 dark:text-slate-300">${exp.paidBy}</span></td>
+                        <td class="p-3 text-right">
                             <button onclick="deleteExpense('${exp.id}')" class="text-xs text-red-500 hover:underline">Remove</button>
                         </td>
                     </tr>`;
             });
 
             summaryContainer.innerHTML += `
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Spent</span>
-                    <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">$${totalSpent.toFixed(2)}</div>
+                <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Spent</span>
+                    <div class="text-lg sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">$${totalSpent.toFixed(2)}</div>
                 </div>`;
 
             travelers.forEach(t => {
                 summaryContainer.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">${t} Paid</span>
-                        <div class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">$${(paidMap[t] || 0).toFixed(2)}</div>
+                    <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <span class="text-[10px] font-semibold text-blue-500 uppercase tracking-wider">${t} Paid</span>
+                        <div class="text-base sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">$${(paidMap[t] || 0).toFixed(2)}</div>
                     </div>`;
             });
 
-            // Natural Language Pairwise Settlement Calculation
             const settlementContainer = document.getElementById('settlement-container');
             if(settlementContainer) {
                 settlementContainer.innerHTML = '';
@@ -924,7 +923,7 @@
                     let c = creditors[j];
                     let amount = Math.min(d.amount, c.amount);
 
-                    settlements.push(`<div class="flex items-center space-x-2 text-sm text-slate-200"><i data-lucide="arrow-right" class="w-4 h-4 text-emerald-400"></i> <span><strong>${d.name}</strong> owes <strong>${c.name}</strong> <span class="text-emerald-400 font-bold">$${amount.toFixed(2)}</span></span></div>`);
+                    settlements.push(`<div class="flex items-center space-x-1.5 text-xs sm:text-sm text-slate-200"><i data-lucide="arrow-right" class="w-3.5 h-3.5 text-emerald-400"></i> <span><strong>${d.name}</strong> owes <strong>${c.name}</strong> <span class="text-emerald-400 font-bold">$${amount.toFixed(2)}</span></span></div>`);
 
                     d.amount -= amount;
                     c.amount -= amount;
@@ -942,7 +941,6 @@
             lucide.createIcons();
         }
 
-        // Map rendering
         function renderMap() {
             const mapContainer = document.getElementById('map');
             if(!mapContainer) return;
@@ -967,7 +965,6 @@
             }
         }
 
-        // Legs Manager
         function openLegModal(id = null) {
             document.getElementById('leg-form').reset();
             document.getElementById('leg-id').value = '';
@@ -1025,11 +1022,11 @@
 
             tripLegs.forEach(leg => {
                 container.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2 hover:border-red-300 transition">
+                    <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2 hover:border-red-300 transition">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-bold text-slate-900 dark:text-white text-base">${leg.title}</h4>
-                                <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-medium">${leg.startDate || ''} to ${leg.endDate || ''}</span>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${leg.title}</h4>
+                                <span class="text-[10px] sm:text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-medium">${leg.startDate || ''} to ${leg.endDate || ''}</span>
                             </div>
                             <div class="space-x-2">
                                 <button onclick="openLegModal('${leg.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
@@ -1038,13 +1035,12 @@
                         </div>
                         ${leg.lodging ? `<p class="text-xs text-slate-600 dark:text-slate-300"><strong>Lodging:</strong> ${leg.lodging}</p>` : ''}
                         <p class="text-xs text-slate-500 dark:text-slate-400">${leg.notes || ''}</p>
-                        ${leg.lodgingUrl ? `<a href="${leg.lodgingUrl}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold pt-1">Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : ''}
+                        ${leg.lodgingUrl ? `<a href="${leg.lodgingUrl}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold pt-0.5">Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : ''}
                     </div>`;
             });
             lucide.createIcons();
         }
 
-        // Reservation Manager
         function openReservationModal(id = null) {
             document.getElementById('reservation-form').reset();
             document.getElementById('res-id').value = '';
@@ -1094,25 +1090,25 @@
             container.innerHTML = '';
 
             if(reservations.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg col-span-3">No reservations logged yet. Click "+ Add Reservation" above.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg col-span-3">No reservations logged yet. Click "+ Add" above.</p>`;
                 return;
             }
 
             reservations.forEach(r => {
                 container.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3 hover:border-blue-300 transition flex flex-col justify-between">
-                        <div class="space-y-2">
+                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2.5 hover:border-blue-300 transition flex flex-col justify-between">
+                        <div class="space-y-1.5">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">${r.type || 'Booking'}</span>
-                                    <h4 class="font-bold text-slate-900 dark:text-white text-lg">${r.name}</h4>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">${r.type || 'Booking'}</span>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg leading-snug">${r.name}</h4>
                                 </div>
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${r.status === 'Confirmed' ? 'bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'}">${r.status}</span>
+                                <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full ${r.status === 'Confirmed' ? 'bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'}">${r.status}</span>
                             </div>
                             <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Location:</strong> ${r.location || '-'}</p>
                             <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Cost:</strong> ${r.cost || '-'}</p>
                         </div>
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
                             ${r.link ? `<a href="${r.link}" target="_blank" class="inline-flex items-center text-xs text-blue-600 hover:underline font-semibold">Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : `<span class="text-xs text-slate-400 italic">No link</span>`}
                             <div class="space-x-2">
                                 <button onclick="openReservationModal('${r.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
@@ -1168,8 +1164,8 @@
                 const colorClass = colors[idx % colors.length];
                 if(container) {
                     container.innerHTML += `
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}">
-                            <i data-lucide="user" class="w-3 h-3 mr-1"></i> ${name}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${colorClass} flex-shrink-0">
+                            <i data-lucide="user" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1"></i> ${name}
                         </span>`;
                 }
                 if(modalList) {
