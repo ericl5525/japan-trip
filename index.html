@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Travel Journal & Planner</title>
+    <title>Japan Trip 2026 & Planner</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -237,7 +237,6 @@
 
             <div id="expenses-summary-cards" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
 
-            <!-- Directional Splitwise Settlement Card -->
             <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-800">
                 <div class="flex items-center space-x-2 mb-2">
                     <i data-lucide="arrow-right-left" class="w-4 h-4 text-emerald-400"></i>
@@ -286,7 +285,168 @@
 
     </main>
 
-    <!-- MODAL: EXPENSE (WITH MULTI-CURRENCY & CUSTOM SPLIT) -->
+    <!-- MODAL: ACCOMMODATION -->
+    <div id="modal-accommodation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="acc-modal-title">Add Accommodation</h3>
+                <button onclick="closeModal('modal-accommodation')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="accommodation-form" onsubmit="saveAccommodation(event)" class="space-y-2.5 text-xs sm:text-sm">
+                <input type="hidden" id="acc-id">
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Place / Property Name</label>
+                    <input type="text" id="acc-name" required placeholder="e.g. Home in Shinagawa City" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Area / City</label>
+                        <input type="text" id="acc-area" required placeholder="e.g. Shinagawa" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost / Price</label>
+                        <input type="text" id="acc-price" placeholder="e.g. $226.81" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking / Airbnb Link</label>
+                    <input type="url" id="acc-link" placeholder="https://www.airbnb.com/trips/..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes / Instructions</label>
+                    <textarea id="acc-notes" rows="2" placeholder="Door codes, check-in instructions..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-accommodation')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Accommodation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TRIP TITLE & DATES -->
+    <div id="modal-trip-title" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold">Edit Trip Details</h3>
+                <button onclick="closeModal('modal-trip-title')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="saveTripDetails(event)" class="space-y-2.5 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Name</label>
+                    <input type="text" id="edit-trip-name-input" required placeholder="e.g. Japan Trip 2026" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Trip Dates Badge</label>
+                    <input type="text" id="edit-trip-dates-input" placeholder="e.g. Nov 25 - Dec 12" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-trip-title')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT TRIP LEG -->
+    <div id="modal-leg" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="leg-modal-title">Add / Edit Trip Leg</h3>
+                <button onclick="closeModal('modal-leg')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="leg-form" onsubmit="saveLeg(event)" class="space-y-2.5 text-xs sm:text-sm">
+                <input type="hidden" id="leg-id">
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Destination Name</label>
+                    <input type="text" id="leg-title" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Start Date</label>
+                        <input type="date" id="leg-start" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">End Date</label>
+                        <input type="date" id="leg-end" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Lodging Details / Name</label>
+                    <input type="text" id="leg-lodging" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
+                    <input type="url" id="leg-lodging-url" placeholder="https://www.airbnb.com/..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Key Activities</label>
+                    <textarea id="leg-notes" rows="2" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-leg')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Leg</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT RESERVATION -->
+    <div id="modal-reservation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="res-modal-title">Add / Edit Reservation</h3>
+                <button onclick="closeModal('modal-reservation')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="reservation-form" onsubmit="saveReservation(event)" class="space-y-2.5 text-xs sm:text-sm">
+                <input type="hidden" id="res-id">
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Name</label>
+                    <input type="text" id="res-name" required placeholder="e.g. Kyoto Townhouse Airbnb" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Type</label>
+                        <select id="res-type" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                            <option value="Lodging">Lodging</option>
+                            <option value="Car Rental">Car Rental</option>
+                            <option value="Flight">Flight</option>
+                            <option value="Activity / Attraction">Activity / Attraction</option>
+                            <option value="Restaurant">Restaurant</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Status</label>
+                        <select id="res-status" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Action Required">Action Required</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Location</label>
+                        <input type="text" id="res-location" placeholder="e.g. Kyoto" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Cost</label>
+                        <input type="text" id="res-cost" placeholder="e.g. $366.42" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Booking Link / URL</label>
+                    <input type="url" id="res-link" placeholder="https://..." class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-reservation')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPENSE -->
     <div id="modal-expense" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
         <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
@@ -352,6 +512,56 @@
         </div>
     </div>
 
+    <!-- MODAL: DYNAMIC TRAVELERS -->
+    <div id="modal-travelers" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold">Manage Group Travelers</h3>
+                <button onclick="closeModal('modal-travelers')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="saveTraveler(event)" class="flex space-x-2 text-xs sm:text-sm">
+                <input type="text" id="new-traveler-name" placeholder="Enter traveler name..." required class="flex-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                <button type="submit" class="px-3 py-1.5 font-semibold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 rounded-lg">+ Add</button>
+            </form>
+            <div class="space-y-2 pt-1 text-xs">
+                <label class="block font-semibold text-slate-600 dark:text-slate-300">Current Travelers:</label>
+                <div id="travelers-list-modal" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="closeModal('modal-travelers')" class="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DATE DETAILS -->
+    <div id="modal-date-details" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2.5">
+                <h3 class="text-base font-bold" id="date-details-title">Edit Date Details</h3>
+                <button onclick="closeModal('modal-date-details')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="date-form" onsubmit="saveDateDetails(event)" class="space-y-2.5 text-xs sm:text-sm">
+                <input type="hidden" id="edit-date-key">
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Location Header</label>
+                    <input type="text" id="edit-date-title" required class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Base Lodging</label>
+                    <input type="text" id="edit-date-lodging" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Notes & Activities</label>
+                    <textarea id="edit-date-notes" rows="3" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg p-2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-date-details')" class="px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Application Engine JavaScript -->
     <script>
         let dateMap = {}, expenses = [], tripLegs = [], reservations = [], accommodations = [];
@@ -359,14 +569,13 @@
         let tripDetails = { name: 'Japan Trip 2026', dates: 'Nov 25 - Dec 12' };
         let leafletMap = null;
 
-        // Exchange rates relative to USD (Live/Fallback Rates)
         let exchangeRates = {
             USD: 1.0,
-            JPY: 152.5, // 1 USD = ~152.5 JPY
-            EUR: 0.92,  // 1 USD = ~0.92 EUR
-            GBP: 0.77,  // 1 USD = ~0.77 GBP
-            CAD: 1.38,  // 1 USD = ~1.38 CAD
-            AUD: 1.50   // 1 USD = ~1.50 AUD
+            JPY: 152.5,
+            EUR: 0.92,
+            GBP: 0.77,
+            CAD: 1.38,
+            AUD: 1.50
         };
 
         const today = new Date();
@@ -474,6 +683,20 @@
             if(gmapBtn) gmapBtn.href = `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
         }
 
+        function openTripTitleModal() {
+            document.getElementById('edit-trip-name-input').value = tripDetails.name || 'Japan Trip 2026';
+            document.getElementById('edit-trip-dates-input').value = tripDetails.dates || 'Nov 25 - Dec 12';
+            openModal('modal-trip-title');
+        }
+
+        function saveTripDetails(e) {
+            e.preventDefault();
+            const name = document.getElementById('edit-trip-name-input').value.trim();
+            const dates = document.getElementById('edit-trip-dates-input').value.trim();
+            db.ref('tripDetails').set({ name, dates });
+            closeModal('modal-trip-title');
+        }
+
         function switchTab(tabId) {
             ['calendar', 'itinerary', 'accommodations', 'expenses', 'reservations'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
@@ -537,6 +760,106 @@
                 }
             }
         }
+
+        function navigateMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        }
+
+        function jumpToMonth(yearMonthStr) {
+            const [year, month] = yearMonthStr.split('-');
+            currentYear = parseInt(year);
+            currentMonth = parseInt(month) - 1;
+            renderCalendar();
+        }
+
+        function jumpToToday() {
+            currentYear = today.getFullYear();
+            currentMonth = today.getMonth();
+            renderCalendar();
+        }
+
+        function jumpToCurrentTripMonth() {
+            currentYear = 2026;
+            currentMonth = 10;
+            renderCalendar();
+        }
+
+        function renderAccommodations() {
+            const container = document.getElementById('accommodations-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if (accommodations.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg col-span-3">No accommodations added yet. Click "+ Add" above.</p>`;
+                return;
+            }
+
+            accommodations.forEach(acc => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2.5 hover:border-red-300 transition flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">LODGING</span>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg leading-snug">${acc.name}</h4>
+                                </div>
+                                ${acc.price ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">${acc.price}</span>` : ''}
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Area:</strong> ${acc.area}</p>
+                            ${acc.notes ? `<p class="text-xs text-slate-500 dark:text-slate-400">${acc.notes}</p>` : ''}
+                        </div>
+                        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                            ${acc.link ? `<a href="${acc.link}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold">View Booking <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : `<span class="text-xs text-slate-400 italic">No link</span>`}
+                            <div class="space-x-2">
+                                <button onclick="openAccommodationModal('${acc.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
+                                <button onclick="deleteAccommodation('${acc.id}')" class="text-xs text-red-500 hover:underline">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function openAccommodationModal(id = null) {
+            document.getElementById('accommodation-form').reset();
+            document.getElementById('acc-id').value = '';
+            document.getElementById('acc-modal-title').innerText = 'Add Accommodation';
+
+            if(id) {
+                const acc = accommodations.find(a => a.id === id);
+                if(acc) {
+                    document.getElementById('acc-id').value = acc.id;
+                    document.getElementById('acc-name').value = acc.name || '';
+                    document.getElementById('acc-area').value = acc.area || '';
+                    document.getElementById('acc-price').value = acc.price || '';
+                    document.getElementById('acc-link').value = acc.link || '';
+                    document.getElementById('acc-notes').value = acc.notes || '';
+                    document.getElementById('acc-modal-title').innerText = 'Edit Accommodation';
+                }
+            }
+            openModal('modal-accommodation');
+        }
+
+        function saveAccommodation(e) {
+            e.preventDefault();
+            const id = document.getElementById('acc-id').value;
+            const data = {
+                name: document.getElementById('acc-name').value,
+                area: document.getElementById('acc-area').value,
+                price: document.getElementById('acc-price').value,
+                link: document.getElementById('acc-link').value,
+                notes: document.getElementById('acc-notes').value
+            };
+
+            if(id) { db.ref(`accommodations/${id}`).update(data); }
+            else { db.ref('accommodations').push(data); }
+            closeModal('modal-accommodation');
+        }
+
+        function deleteAccommodation(id) { db.ref(`accommodations/${id}`).remove(); }
 
         function openExpenseModal() { 
             document.getElementById('expense-form').reset();
@@ -703,7 +1026,265 @@
             lucide.createIcons();
         }
 
+        function renderMap() {
+            const mapContainer = document.getElementById('map');
+            if(!mapContainer) return;
+
+            if(!leafletMap) {
+                leafletMap = L.map('map').setView([36.2048, 138.2529], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(leafletMap);
+            }
+
+            leafletMap.invalidateSize();
+
+            if(tripLegs && tripLegs.length > 0) {
+                tripLegs.forEach(leg => {
+                    if(leg.lat && leg.lng) {
+                        L.marker([leg.lat, leg.lng]).addTo(leafletMap)
+                            .bindPopup(`<b>${leg.title}</b><br>${leg.notes || ''}`);
+                    }
+                });
+            }
+        }
+
+        function openLegModal(id = null) {
+            document.getElementById('leg-form').reset();
+            document.getElementById('leg-id').value = '';
+            document.getElementById('leg-modal-title').innerText = 'Add Trip Leg';
+
+            if(id) {
+                const leg = tripLegs.find(l => l.id === id);
+                if(leg) {
+                    document.getElementById('leg-id').value = leg.id;
+                    document.getElementById('leg-title').value = leg.title || '';
+                    document.getElementById('leg-start').value = leg.startDate || '';
+                    document.getElementById('leg-end').value = leg.endDate || '';
+                    document.getElementById('leg-lodging').value = leg.lodging || '';
+                    document.getElementById('leg-lodging-url').value = leg.lodgingUrl || '';
+                    document.getElementById('leg-notes').value = leg.notes || '';
+                    document.getElementById('leg-modal-title').innerText = 'Edit Trip Leg';
+                }
+            }
+            openModal('modal-leg');
+        }
+
+        function saveLeg(e) {
+            e.preventDefault();
+            const id = document.getElementById('leg-id').value;
+            const legData = {
+                title: document.getElementById('leg-title').value,
+                startDate: document.getElementById('leg-start').value,
+                endDate: document.getElementById('leg-end').value,
+                lodging: document.getElementById('leg-lodging').value,
+                lodgingUrl: document.getElementById('leg-lodging-url').value,
+                notes: document.getElementById('leg-notes').value,
+                lat: 35.6762,
+                lng: 139.6503
+            };
+
+            if(id) { db.ref(`tripLegs/${id}`).update(legData); }
+            else { db.ref('tripLegs').push(legData); }
+            closeModal('modal-leg');
+        }
+
+        function deleteLeg(id) { db.ref(`tripLegs/${id}`).remove(); }
+
+        function renderLegs() {
+            const container = document.getElementById('legs-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if(tripLegs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg">No trip legs added yet. Click "+ Add Leg" above.</p>`;
+                return;
+            }
+
+            tripLegs.forEach(leg => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2 hover:border-red-300 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${leg.title}</h4>
+                                <span class="text-[10px] sm:text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-medium">${leg.startDate || ''} to ${leg.endDate || ''}</span>
+                            </div>
+                            <div class="space-x-2">
+                                <button onclick="openLegModal('${leg.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
+                                <button onclick="deleteLeg('${leg.id}')" class="text-xs text-red-500 hover:underline">Delete</button>
+                            </div>
+                        </div>
+                        ${leg.lodging ? `<p class="text-xs text-slate-600 dark:text-slate-300"><strong>Lodging:</strong> ${leg.lodging}</p>` : ''}
+                        <p class="text-xs text-slate-500 dark:text-slate-400">${leg.notes || ''}</p>
+                        ${leg.lodgingUrl ? `<a href="${leg.lodgingUrl}" target="_blank" class="inline-flex items-center text-xs text-red-500 hover:underline font-semibold pt-0.5">Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : ''}
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function openReservationModal(id = null) {
+            document.getElementById('reservation-form').reset();
+            document.getElementById('res-id').value = '';
+            document.getElementById('res-modal-title').innerText = 'Add Reservation';
+
+            if(id) {
+                const res = reservations.find(r => r.id === id);
+                if(res) {
+                    document.getElementById('res-id').value = res.id;
+                    document.getElementById('res-name').value = res.name || '';
+                    document.getElementById('res-type').value = res.type || 'Lodging';
+                    document.getElementById('res-status').value = res.status || 'Confirmed';
+                    document.getElementById('res-location').value = res.location || '';
+                    document.getElementById('res-cost').value = res.cost || '';
+                    document.getElementById('res-link').value = res.link || '';
+                    document.getElementById('res-modal-title').innerText = 'Edit Reservation';
+                }
+            }
+            openModal('modal-reservation');
+        }
+
+        function saveReservation(e) {
+            e.preventDefault();
+            const id = document.getElementById('res-id').value;
+            const resData = {
+                name: document.getElementById('res-name').value,
+                type: document.getElementById('res-type').value,
+                status: document.getElementById('res-status').value,
+                location: document.getElementById('res-location').value,
+                cost: document.getElementById('res-cost').value,
+                link: document.getElementById('res-link').value
+            };
+
+            if(id) { db.ref(`reservations/${id}`).update(resData); }
+            else { db.ref('reservations').push(resData); }
+            closeModal('modal-reservation');
+        }
+
+        function deleteReservation(id) { db.ref(`reservations/${id}`).remove(); }
+
+        function renderReservations() {
+            const container = document.getElementById('reservations-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if(reservations.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 border border-dashed rounded-lg col-span-3">No reservations logged yet. Click "+ Add" above.</p>`;
+                return;
+            }
+
+            reservations.forEach(r => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2.5 hover:border-blue-300 transition flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">${r.type || 'Booking'}</span>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg leading-snug">${r.name}</h4>
+                                </div>
+                                <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full ${r.status === 'Confirmed' ? 'bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'}">${r.status}</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Location:</strong> ${r.location || '-'}</p>
+                            <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Cost:</strong> ${r.cost || '-'}</p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                            ${r.link ? `<a href="${r.link}" target="_blank" class="inline-flex items-center text-xs text-blue-600 hover:underline font-semibold">Booking Link <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a>` : `<span class="text-xs text-slate-400 italic">No link</span>`}
+                            <div class="space-x-2">
+                                <button onclick="openReservationModal('${r.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
+                                <button onclick="deleteReservation('${r.id}')" class="text-xs text-red-500 hover:underline">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function toggleCustomCategory(val) {
+            const container = document.getElementById('custom-category-container');
+            if (val === 'Custom') {
+                container.classList.remove('hidden');
+                document.getElementById('exp-category-custom').required = true;
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('exp-category-custom').required = false;
+            }
+        }
+
         function deleteExpense(id) { db.ref(`expenses/${id}`).remove(); }
+
+        function renderTravelerBadges() {
+            const container = document.getElementById('traveler-badges-container');
+            const modalList = document.getElementById('travelers-list-modal');
+            const selectPayer = document.getElementById('exp-payer');
+            const subtitle = document.getElementById('expense-subtitle');
+
+            const colors = ['bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300', 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300', 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300', 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300', 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'];
+
+            if(container) container.innerHTML = '';
+            if(modalList) modalList.innerHTML = '';
+            if(selectPayer) selectPayer.innerHTML = '';
+
+            travelers.forEach((name, idx) => {
+                const colorClass = colors[idx % colors.length];
+                if(container) {
+                    container.innerHTML += `
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${colorClass} flex-shrink-0">
+                            <i data-lucide="user" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1"></i> ${name}
+                        </span>`;
+                }
+                if(modalList) {
+                    modalList.innerHTML += `
+                        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700 p-2 rounded-lg border dark:border-slate-600 text-xs">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">${name}</span>
+                            <button onclick="removeTraveler('${name}')" class="text-red-500 hover:underline">Remove</button>
+                        </div>`;
+                }
+                if(selectPayer) selectPayer.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+
+            if(subtitle) subtitle.innerText = `Live balance breakdown for ${travelers.join(', ')} in USD ($).`;
+            lucide.createIcons();
+        }
+
+        function saveTraveler(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-traveler-name');
+            const name = input.value.trim();
+            if (name && !travelers.includes(name)) {
+                travelers.push(name);
+                db.ref('travelers').set(travelers);
+                input.value = '';
+            }
+        }
+
+        function removeTraveler(name) {
+            travelers = travelers.filter(t => t !== name);
+            db.ref('travelers').set(travelers);
+        }
+
+        function openTravelersModal() { openModal('modal-travelers'); }
+
+        function openDateDetailsModal(dateKey) {
+            const data = dateMap[dateKey] || { title: 'Day Schedule', notes: '', lodging: '' };
+            document.getElementById('edit-date-key').value = dateKey;
+            document.getElementById('date-details-title').innerText = `Edit Details for ${dateKey}`;
+            document.getElementById('edit-date-title').value = data.title;
+            document.getElementById('edit-date-lodging').value = data.lodging || '';
+            document.getElementById('edit-date-notes').value = data.notes || '';
+            openModal('modal-date-details');
+        }
+
+        function saveDateDetails(e) {
+            e.preventDefault();
+            const dateKey = document.getElementById('edit-date-key').value;
+            db.ref(`dateMap/${dateKey}`).set({
+                title: document.getElementById('edit-date-title').value,
+                lodging: document.getElementById('edit-date-lodging').value,
+                notes: document.getElementById('edit-date-notes').value
+            });
+            closeModal('modal-date-details');
+        }
+
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -712,6 +1293,8 @@
             lucide.createIcons();
             populateMonthDropdown();
             renderTripDetails();
+            renderTravelerBadges();
+            renderCalendar();
         });
     </script>
 </body>
