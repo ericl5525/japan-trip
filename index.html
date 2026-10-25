@@ -166,9 +166,9 @@
                 <div>
                     <h4 class="font-semibold">Logistics Notes & Luggage Plan:</h4>
                     <ul class="list-disc list-inside mt-1 space-y-1 text-amber-700 dark:text-amber-400 text-[11px] sm:text-xs">
-                        <li>Option A: Fly straight out of Osaka (ITM) on Dec 2 to Sapporo. Forward checked luggage directly to Tokyo hotel/Airbnb[cite: 1].</li>
-                        <li>Option B: Book a domestic flight allowing checked luggage both ways[cite: 1].</li>
-                        <li>Fitting side trips: Schedule Kamakura / Nikko car rentals during the final Tokyo leg (Dec 8–11)[cite: 1].</li>
+                        <li>Option A: Fly straight out of Osaka (ITM) on Dec 2 to Sapporo. Forward checked luggage directly to Tokyo hotel/Airbnb.</li>
+                        <li>Option B: Book a domestic flight allowing checked luggage both ways.</li>
+                        <li>Fitting side trips: Schedule Kamakura / Nikko car rentals during the final Tokyo leg (Dec 8–11).</li>
                     </ul>
                 </div>
             </div>
@@ -861,12 +861,52 @@
 
         function deleteAccommodation(id) { db.ref(`accommodations/${id}`).remove(); }
 
-        function openExpenseModal() { 
+        function openExpenseModal(id = null) { 
             document.getElementById('expense-form').reset();
+            document.getElementById('exp-id').value = '';
+            document.getElementById('expense-modal-title').innerText = 'Add Expense Item';
             toggleCustomCategory('Lodging');
 
+            if (id) {
+                const exp = expenses.find(e => e.id === id);
+                if (exp) {
+                    document.getElementById('exp-id').value = exp.id;
+                    document.getElementById('exp-name').value = exp.description || '';
+                    document.getElementById('exp-currency').value = exp.currency || 'USD';
+                    document.getElementById('exp-amount').value = exp.originalAmount || exp.amount || '';
+                    document.getElementById('exp-payer').value = exp.paidBy || '';
+                    
+                    const standardCats = ['Lodging', 'Transportation', 'Food & Dining', 'Activities', 'Misc'];
+                    if (standardCats.includes(exp.category)) {
+                        document.getElementById('exp-category-select').value = exp.category;
+                    } else {
+                        document.getElementById('exp-category-select').value = 'Custom';
+                        toggleCustomCategory('Custom');
+                        document.getElementById('exp-category-custom').value = exp.category || '';
+                    }
+
+                    document.getElementById('expense-modal-title').innerText = 'Edit Expense Item';
+
+                    const boxContainer = document.getElementById('expense-split-checkboxes');
+                    if (boxContainer) {
+                        boxContainer.innerHTML = '';
+                        const splitList = (exp.splitWith && Array.isArray(exp.splitWith)) ? exp.splitWith : travelers;
+                        travelers.forEach(t => {
+                            const isChecked = splitList.includes(t) ? 'checked' : '';
+                            boxContainer.innerHTML += `
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-700 px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" name="split-participants" value="${t}" ${isChecked} class="rounded text-emerald-600 focus:ring-emerald-500">
+                                    <span>${t}</span>
+                                </label>`;
+                        });
+                    }
+                    openModal('modal-expense');
+                    return;
+                }
+            }
+
             const boxContainer = document.getElementById('expense-split-checkboxes');
-            if(boxContainer) {
+            if (boxContainer) {
                 boxContainer.innerHTML = '';
                 travelers.forEach(t => {
                     boxContainer.innerHTML += `
@@ -881,6 +921,7 @@
 
         function saveExpense(e) {
             e.preventDefault();
+            const id = document.getElementById('exp-id').value;
             const selectVal = document.getElementById('exp-category-select').value;
             const customVal = document.getElementById('exp-category-custom').value;
             const finalCategory = (selectVal === 'Custom' && customVal.trim()) ? customVal.trim() : selectVal;
@@ -892,9 +933,9 @@
 
             const checkboxes = document.querySelectorAll('input[name="split-participants"]:checked');
             let selectedSplit = Array.from(checkboxes).map(cb => cb.value);
-            if(selectedSplit.length === 0) selectedSplit = [...travelers];
+            if (selectedSplit.length === 0) selectedSplit = [...travelers];
 
-            db.ref('expenses').push({
+            const expenseData = {
                 description: document.getElementById('exp-name').value,
                 originalAmount: rawAmount,
                 currency: curr,
@@ -902,7 +943,13 @@
                 paidBy: document.getElementById('exp-payer').value,
                 splitWith: selectedSplit,
                 category: finalCategory
-            });
+            };
+
+            if (id) {
+                db.ref(`expenses/${id}`).update(expenseData);
+            } else {
+                db.ref('expenses').push(expenseData);
+            }
             closeModal('modal-expense');
         }
 
@@ -947,7 +994,7 @@
                 const itemUsdShare = usdAmt / splitList.length;
 
                 splitList.forEach(p => {
-                    if(owedShareMap[p] !== undefined) {
+                    if (owedShareMap[p] !== undefined) {
                         owedShareMap[p] += itemUsdShare;
                     }
                 });
@@ -964,7 +1011,8 @@
                         <td class="p-3 font-semibold text-slate-500">${curr === 'JPY' ? '¥' : ''}${origAmt.toFixed(2)} ${curr}</td>
                         <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">$${usdAmt.toFixed(2)}</td>
                         <td class="p-3"><span class="font-semibold text-xs text-slate-700 dark:text-slate-300">${exp.paidBy}</span></td>
-                        <td class="p-3 text-right">
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="openExpenseModal('${exp.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
                             <button onclick="deleteExpense('${exp.id}')" class="text-xs text-red-500 hover:underline">Remove</button>
                         </td>
                     </tr>`;
