@@ -157,7 +157,7 @@
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <div class="bg-slate-800 dark:bg-slate-950 text-white px-3 py-2.5 font-semibold flex justify-between items-center text-xs sm:text-sm">
                     <span id="calendar-header-title">November 2026</span>
-                    <span id="calendar-header-subtitle" class="text-[10px] sm:text-xs font-normal text-slate-300 truncate max-w-[180px] sm:max-w-none">RDU &rarr; TOK &rarr; KYO</span>
+                    <span id="calendar-header-subtitle" class="text-[10px] sm:text-xs font-normal text-slate-300 truncate max-w-[180px] sm:max-w-none">RDU → TOK → KYO</span>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -249,7 +249,7 @@
             <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-800">
                 <div class="flex items-center space-x-2 mb-2">
                     <i data-lucide="arrow-right-left" class="w-4 h-4 text-emerald-400"></i>
-                    <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300">Simplified Group Settlement</h3>
+                    <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300">Direct Group Settlements</h3>
                 </div>
                 <div id="settlement-container" class="space-y-2 text-xs sm:text-sm font-medium pt-1"></div>
             </div>
@@ -976,7 +976,7 @@
             const summaryContainer = document.getElementById('expenses-summary-cards');
             const settlementContainer = document.getElementById('settlement-container');
 
-            if(!tbody || !summaryContainer || !settlementContainer) return;
+            if (!tbody || !summaryContainer || !settlementContainer) return;
 
             tbody.innerHTML = '';
             summaryContainer.innerHTML = '';
@@ -991,21 +991,29 @@
             let totalSpentUSD = 0;
             let paidMap = {};
             let owedShareMap = {};
+            
+            // Pairwise matrix: pairwiseOwed[borrower][lender] = amount
+            let pairwiseOwed = {};
 
-            travelers.forEach(t => {
-                paidMap[t] = 0;
-                owedShareMap[t] = 0;
+            travelers.forEach(t1 => {
+                paidMap[t1] = 0;
+                owedShareMap[t1] = 0;
+                pairwiseOwed[t1] = {};
+                travelers.forEach(t2 => {
+                    pairwiseOwed[t1][t2] = 0;
+                });
             });
 
             expenses.forEach(exp => {
                 const usdAmt = parseFloat(exp.amount) || 0;
                 const origAmt = parseFloat(exp.originalAmount) || usdAmt;
                 const curr = exp.currency || 'USD';
+                const payer = exp.paidBy;
 
                 totalSpentUSD += usdAmt;
 
-                if (paidMap[exp.paidBy] !== undefined) {
-                    paidMap[exp.paidBy] += usdAmt;
+                if (paidMap[payer] !== undefined) {
+                    paidMap[payer] += usdAmt;
                 }
 
                 const splitList = (exp.splitWith && Array.isArray(exp.splitWith) && exp.splitWith.length > 0) ? exp.splitWith : travelers;
@@ -1015,9 +1023,12 @@
                     if (owedShareMap[p] !== undefined) {
                         owedShareMap[p] += itemUsdShare;
                     }
+                    if (p !== payer && pairwiseOwed[p] && pairwiseOwed[p][payer] !== undefined) {
+                        pairwiseOwed[p][payer] += itemUsdShare;
+                    }
                 });
 
-                const splitLabel = splitList.length === N ? 'All 3' : splitList.join(', ');
+                const splitLabel = splitList.length === N ? 'All ' + N : splitList.join(', ');
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
@@ -1036,6 +1047,7 @@
                     </tr>`;
             });
 
+            // Render Total and Individual Paid Cards
             summaryContainer.innerHTML += `
                 <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
                     <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Spent</span>
@@ -1051,41 +1063,38 @@
                     </div>`;
             });
 
-            let debtors = [];
-            let creditors = [];
+            // Splitwise Direct Pairwise Debt Calculation
+            let directDebtsCount = 0;
+            for (let i = 0; i < N; i++) {
+                for (let j = i + 1; j < N; j++) {
+                    const p1 = travelers[i];
+                    const p2 = travelers[j];
 
-            travelers.forEach(t => {
-                const netBalance = Math.round(((paidMap[t] || 0) - (owedShareMap[t] || 0)) * 100) / 100;
-                if (netBalance < -0.01) debtors.push({ name: t, amount: Math.abs(netBalance) });
-                else if (netBalance > 0.01) creditors.push({ name: t, amount: netBalance });
-            });
+                    const p1OwesP2 = pairwiseOwed[p1][p2] || 0;
+                    const p2OwesP1 = pairwiseOwed[p2][p1] || 0;
 
-            let i = 0, j = 0;
-            let count = 0;
+                    const netBalance = Math.round((p1OwesP2 - p2OwesP1) * 100) / 100;
 
-            while (i < debtors.length && j < creditors.length) {
-                let d = debtors[i];
-                let c = creditors[j];
-                let amount = Math.min(d.amount, c.amount);
-                amount = Math.round(amount * 100) / 100;
-
-                if (amount > 0) {
-                    settlementContainer.innerHTML += `
-                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-slate-200 py-1 border-b border-slate-800/60 last:border-0">
-                            <i data-lucide="arrow-right-circle" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-                            <span><strong class="text-white font-semibold">${d.name}</strong> owes <strong class="text-white font-semibold">${c.name}</strong> <span class="text-emerald-400 font-bold">$${amount.toFixed(2)} USD</span></span>
-                        </div>`;
-                    count++;
+                    if (netBalance > 0.01) {
+                        settlementContainer.innerHTML += `
+                            <div class="flex items-center space-x-2 text-xs sm:text-sm text-slate-200 py-1 border-b border-slate-800/60 last:border-0">
+                                <i data-lucide="arrow-right-circle" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                                <span><strong class="text-white font-semibold">${p1}</strong> owes <strong class="text-white font-semibold">${p2}</strong> <span class="text-emerald-400 font-bold">$${netBalance.toFixed(2)} USD</span></span>
+                            </div>`;
+                        directDebtsCount++;
+                    } else if (netBalance < -0.01) {
+                        const amt = Math.abs(netBalance);
+                        settlementContainer.innerHTML += `
+                            <div class="flex items-center space-x-2 text-xs sm:text-sm text-slate-200 py-1 border-b border-slate-800/60 last:border-0">
+                                <i data-lucide="arrow-right-circle" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                                <span><strong class="text-white font-semibold">${p2}</strong> owes <strong class="text-white font-semibold">${p1}</strong> <span class="text-emerald-400 font-bold">$${amt.toFixed(2)} USD</span></span>
+                            </div>`;
+                        directDebtsCount++;
+                    }
                 }
-
-                d.amount = Math.round((d.amount - amount) * 100) / 100;
-                c.amount = Math.round((c.amount - amount) * 100) / 100;
-
-                if (d.amount <= 0.01) i++;
-                if (c.amount <= 0.01) j++;
             }
 
-            if (count === 0) {
+            if (directDebtsCount === 0) {
                 settlementContainer.innerHTML = `<div class="text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Everyone is completely settled up!</span></div>`;
             }
 
@@ -1100,7 +1109,7 @@
                 leafletMap = L.map('map').setView([36.2048, 138.2529], 6);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
-                    attribution: '&copy; OpenStreetMap'
+                    attribution: '© OpenStreetMap'
                 }).addTo(leafletMap);
             }
 
